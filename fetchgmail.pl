@@ -8,12 +8,9 @@ $| = 1;
 
 use strict;
 use Data::Dumper;
-#use Encode qw/encode_utf8/;
 use Google::API::Client;
 use Google::API::OAuth2::Client;
 use MIME::Base64::URLSafe;
-#use lib 'eg/lib';
-#use Sample::Utils qw/get_or_restore_token store_token/;
 use Config::Simple;
 # Reenable later if we patch API for multiple labelIds
 #use Text::ParseWords;
