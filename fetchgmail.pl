@@ -65,7 +65,6 @@ if ($opt_help) {
 # Default variables
 my $defaultconfig = $ENV{"HOME"} . "/.fetchgmailrc";
 my $mdacmd = "cat";
-#my $clientsecretfile = $ENV{"HOME"} . "/client_secret.json";
 my $clientid = "";
 my $clientsecret = "";
 my $tokenfile = $ENV{"HOME"} . "token.dat";
@@ -84,7 +83,6 @@ if ( -e $configfile ) {
     my $config = new Config::Simple($configfile);
     $mdacmd = $config->param('mda') || $mdacmd;
     $mdacmd =~ s/~/$homedir/g;
-    #$clientsecretfile = $config->param('clientsecretfile') || $clientsecretfile;
     $clientid = $config->param('clientid') || $clientid;
     $clientsecret = $config->param('clientsecret') || $clientsecret;
     $tokenfile = $config->param('token') || $tokenfile;
@@ -109,15 +107,20 @@ else {
 # mda cat
 mda /usr/bin/formail -s /usr/bin/procmail -f - -m ~/.procmailrc
 
-# API client secrets file (use full path)
-# This is downloaded from https://console.developers.google.com/apis/credentials
-# clientsecretfile ~/.fetchgmail.client_secret.json
+# To create a new API client:
+# - Go to https://console.developers.google.com/apis
+# - Create a project
+#   Project name: fetchgmail
+# - Credentials -> Create credentials -> OAuth client ID -> Other
+# - Dashboard -> ENABLE API -> Gmail API -> ENABLE
 
 # API client ID
+# This can be found at https://console.developers.google.com/apis/credentials
 # clientid 1234567890ab-1234567890abcdefghijklmnopqrstuv.apps.googleusercontent.com
 clientid 1234567890ab-1234567890abcdefghijklmnopqrstuv.apps.googleusercontent.com
 
 # API client secret
+# This can be found at https://console.developers.google.com/apis/credentials
 #clientsecret 1234-567890abcdefghijklm
 clientsecret 1234-567890abcdefghijklm
 
@@ -232,11 +235,6 @@ if ($opt_quit) {
 # Initialize connection
 my $client = Google::API::Client->new;
 my $service = $client->build('gmail', 'v1');
-
-# old way of getting token (less secure)
-#my $auth_driver = Google::API::OAuth2::Client->new_from_client_secrets($clientsecret, $service->{auth_doc});
-#my $access_token = get_or_restore_token($token, $auth_driver);
-#store_token($token, $auth_driver);
 
 # $service->{auth_doc} will provide all (overreaching) scopes
 # We will instead just request the scopes we need.
