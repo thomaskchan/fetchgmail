@@ -479,7 +479,7 @@ sub getmessages {
                     id => $message_id,
                     userId => 'me',
                     format => 'raw',
-                    fields => 'historyId,raw,id',
+                    fields => 'historyId,raw,id,labelIds',
                 }
             )->execute({ auth_driver => $auth_driver });
         };
@@ -487,7 +487,14 @@ sub getmessages {
             $debug && print "Skipping $message_id, unable to get.  You may wish to run a full sync later.\n";
             next;
         }
-        #exit;
+        # Gather labels
+        my $labels = "";
+        foreach my $label (sort @{$res->{labelIds}}) {
+            $labels = "$label,$labels";
+        }
+        $labels =~ s/,$//;
+        
+        # Process raw message
         my $raw = $res->{raw};
         my $decodedmail = urlsafe_b64decode($raw);
 
@@ -515,6 +522,7 @@ sub getmessages {
                 # Add our headers
                 print $mda "X-Google-Id: $message_id\n";
                 print $mda "X-Google-HistoryId: $res->{historyId}\n";
+                print $mda "x-Google-Labels: $labels\n";
                 print $mda "$line\n";
                 $headerfound = 1;
             }
