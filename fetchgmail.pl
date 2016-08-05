@@ -500,7 +500,24 @@ sub getmessages {
 
         # Deliver to MDA
         open my $mda, "| $mdacmd" or die;
-        print $mda $decodedmail;
+        # Add headers to mail for debugging
+        my @lines = split /\n/, $decodedmail;
+        my $headerfound;
+        foreach my $line (@lines) {
+            if ($headerfound) {
+                # We already did the header stuff, just print and go on.
+                print $mda "$line\n";
+                next;
+            }
+            if ($line =~ /^Date:/) {
+                # Add our headers
+                print $mda "X-Google-Id: $message_id\n";
+                print $mda "X-Google-HistoryId: $res->{historyId}\n";
+                print $mda "$line\n";
+                $headerfound = 1;
+            }
+        }
+        #print $mda $decodedmail;
         close $mda;
 
         # Log that we have delivered the id
