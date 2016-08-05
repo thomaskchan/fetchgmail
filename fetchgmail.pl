@@ -516,6 +516,9 @@ sub getmessages {
                 print $mda "$line\n";
                 $headerfound = 1;
             }
+            else {
+                print $mda "$line\n";
+            }
         }
         #print $mda $decodedmail;
         close $mda;
