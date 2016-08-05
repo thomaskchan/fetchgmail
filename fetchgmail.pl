@@ -326,7 +326,9 @@ if ($opt_labels) {
 my @messages;
 
 # Daemonize this program
-daemonize($username,$groupname,$pidfile);
+if ($daemon) {
+    daemonize($username,$groupname,$pidfile);
+}
 
 # Loop for periodic poll
 while (1) {
