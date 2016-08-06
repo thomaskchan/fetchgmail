@@ -491,8 +491,18 @@ sub getmessages {
         my $labelscsv = "";
         foreach my $label (sort @{$res->{labelIds}}) {
             $labelscsv = "$labelscsv,$label";
+                  
         }
         $labelscsv =~ s/^,//;
+
+        # Test if the label we are looking for is in  the list of labelids.
+        # What seems to happen if we do a partial history sync is that we get
+        # the spam emails also.
+        my %labelidsfound = map {$_ => 1} @{$res->{labelIds}};
+        my $labelmatch = "0";
+        if ($labelidsfound{$labels{$labelslist}}) {
+            $labelmatch = "1";
+        }
         
         # Process raw message
         my $raw = $res->{raw};
@@ -523,6 +533,7 @@ sub getmessages {
                 print $mda "X-Google-Id: $message_id\n";
                 print $mda "X-Google-HistoryId: $res->{historyId}\n";
                 print $mda "x-Google-Labels: $labelscsv\n";
+                print $mda "x-Google-Labels-Match: $labelmatch\n";
                 print $mda "$line\n";
                 $headerfound = 1;
             }
