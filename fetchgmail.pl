@@ -488,11 +488,11 @@ sub getmessages {
             next;
         }
         # Gather labels
-        my $labels = "";
+        my $labelscsv = "";
         foreach my $label (sort @{$res->{labelIds}}) {
-            $labels = "$label,$labels";
+            $labelscsv = "$labelscsv,$label";
         }
-        $labels =~ s/,$//;
+        $labelscsv =~ s/^,//;
         
         # Process raw message
         my $raw = $res->{raw};
@@ -522,7 +522,7 @@ sub getmessages {
                 # Add our headers
                 print $mda "X-Google-Id: $message_id\n";
                 print $mda "X-Google-HistoryId: $res->{historyId}\n";
-                print $mda "x-Google-Labels: $labels\n";
+                print $mda "x-Google-Labels: $labelscsv\n";
                 print $mda "$line\n";
                 $headerfound = 1;
             }
