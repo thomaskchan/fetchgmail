@@ -105,73 +105,7 @@ if ( -e $configfile ) {
 else {
     print "WARNING: $configfile does not exist, creating from template.\n";
     print "         Please edit and run again.\n";
-    mkdir_p(dirname($configfile));
-    open (CONFIG, "> $configfile");
-    print CONFIG <<EOF; 
-# What to pipe each mail to
-# mda cat
-mda /usr/bin/formail -s /usr/bin/procmail -f - -m ~/.procmailrc
-
-# To create a new API client:
-# - Go to https://console.developers.google.com/apis
-# - Create a project
-#   Project name: fetchgmail
-# - Credentials -> Create credentials -> OAuth client ID -> Other
-# - Dashboard -> ENABLE API -> Gmail API -> ENABLE
-
-# API client ID
-# This can be found at https://console.developers.google.com/apis/credentials
-# clientid 1234567890ab-1234567890abcdefghijklmnopqrstuv.apps.googleusercontent.com
-clientid 1234567890ab-1234567890abcdefghijklmnopqrstuv.apps.googleusercontent.com
-
-# API client secret
-# This can be found at https://console.developers.google.com/apis/credentials
-#clientsecret 1234-567890abcdefghijklm
-clientsecret 1234-567890abcdefghijklm
-
-# Where to save google token
-# token ~/.fetchgmail/.fetchgmail.token
-token ~/.fetchgmail/.fetchgmail.token
-
-# Message ID cache
-# msgid ~/.fetchgmail/.fetchgmail.msgid
-msgid ~/.fetchgmail/.fetchgmail.msgid
-
-# Path to pidfile
-# pidfile ~/.fetchgmail/.fetchgmail.pid
-pidfile ~/.fetchgmail/.fetchgmail.pid
-
-# Path to logfile
-# logfile ~/.fetchgmail/.fetchgmail.log
-logfile ~/.fetchgmail/.fetchgmail.log
-
-# Fetch all messages whether seen or not (not enabled by default)
-# fetchall 0    Do partial sync + msgid
-# fetchall 1    Do full sync + msgid
-# fetchall 2    Do full sync
-fetchall 0
-
-# Fetch all mail newer than date (1h 2d 3m 4y) (Default: all)
-# newer all
-newer 1d
-
-# Labels to sync from (space delimited, single quote if multiple words)
-# Note: multiple (repeated) labelIds do not currently work, so will only take a single entry
-#       Maybe try to patch the module later
-#labels SPAM '[Mailbox]' INBOX
-labels INBOX
-
-# Additional filters.  Use gmail search operators.  Default is none.
-# filters subject:hello is:unread
-
-# daemon mode:  Poll every x number of seconds.  Default is 0, which means it only runs once.
-# daemon 0
-
-# Print out debug messages.  Default is 0.
-# debug 0
-EOF
-    close CONFIG;
-    chmod 0600, $configfile;
+    writeconfig($configfile);
     exit;
 }
 
@@ -714,4 +648,78 @@ sub logit {
     printf LOG "%s\t%s\n", $date, $message;
     close LOG;
 }
-    
+
+# Write default config
+sub writeconfig {
+    my ($configfile) = @_;
+    mkdir_p(dirname($configfile));
+    open (CONFIG, "> $configfile");
+    print CONFIG <<EOF; 
+# What to pipe each mail to
+# mda cat
+mda /usr/bin/formail -s /usr/bin/procmail -f - -m ~/.procmailrc
+
+# To create a new API client:
+# - Go to https://console.developers.google.com/apis
+# - Create a project
+#   Project name: fetchgmail
+# - Credentials -> Create credentials -> OAuth client ID -> Other
+# - Dashboard -> ENABLE API -> Gmail API -> ENABLE
+
+# API client ID
+# This can be found at https://console.developers.google.com/apis/credentials
+# clientid 1234567890ab-1234567890abcdefghijklmnopqrstuv.apps.googleusercontent.com
+clientid 1234567890ab-1234567890abcdefghijklmnopqrstuv.apps.googleusercontent.com
+
+# API client secret
+# This can be found at https://console.developers.google.com/apis/credentials
+#clientsecret 1234-567890abcdefghijklm
+clientsecret 1234-567890abcdefghijklm
+
+# Where to save google token
+# token ~/.fetchgmail/.fetchgmail.token
+token ~/.fetchgmail/.fetchgmail.token
+
+# Message ID cache
+# msgid ~/.fetchgmail/.fetchgmail.msgid
+msgid ~/.fetchgmail/.fetchgmail.msgid
+
+# Path to pidfile
+# pidfile ~/.fetchgmail/.fetchgmail.pid
+pidfile ~/.fetchgmail/.fetchgmail.pid
+
+# Path to logfile
+# logfile ~/.fetchgmail/.fetchgmail.log
+logfile ~/.fetchgmail/.fetchgmail.log
+
+# Fetch all messages whether seen or not (not enabled by default)
+# fetchall 0    Do partial sync + msgid
+# fetchall 1    Do full sync + msgid
+# fetchall 2    Do full sync
+fetchall 0
+
+# Fetch all mail newer than date (1h 2d 3m 4y) (Default: all)
+# newer all
+newer 1d
+
+# Labels to sync from (space delimited, single quote if multiple words)
+# Note: multiple (repeated) labelIds do not currently work, so will only take a single entry
+#       Maybe try to patch the module later
+#labels SPAM '[Mailbox]' INBOX
+labels INBOX
+
+# Additional filters.  Use gmail search operators.  Default is none.
+# filters subject:hello is:unread
+
+# daemon mode:  Poll every x number of seconds.  Default is 0, which means it only runs once.
+# daemon 0
+
+# Print out debug messages.  Default is 0.
+# debug 0
+EOF
+    close CONFIG;
+    chmod 0600, $configfile;
+}
+
+
+
