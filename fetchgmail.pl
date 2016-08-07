@@ -361,6 +361,10 @@ while (1) {
     }
 
     # Get list of messages
+    
+    # Clear message array per run
+    undef(@messages);
+
     # Test to see if we do a partial or full sync
     if ($msgid->{latest}) {
         eval {
