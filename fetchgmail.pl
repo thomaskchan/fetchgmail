@@ -105,7 +105,7 @@ if ( -e $configfile ) {
 else {
     print "WARNING: $configfile does not exist, creating from template.\n";
     print "         Please edit and run again.\n";
-    mkdir_p(dirname($configfile);
+    mkdir_p(dirname($configfile));
     open (CONFIG, "> $configfile");
     print CONFIG <<EOF; 
 # What to pipe each mail to
