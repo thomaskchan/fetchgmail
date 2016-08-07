@@ -503,6 +503,11 @@ sub getmessages {
         if ($labelidsfound{$labels{$labelslist}}) {
             $labelmatch = "1";
         }
+
+        # If label doesn't match, then don't get the mail
+        if (! $labelmatch) {
+            next;
+        }
         
         # Process raw message
         my $raw = $res->{raw};
