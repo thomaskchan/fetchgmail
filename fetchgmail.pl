@@ -700,9 +700,10 @@ sub mkdir_p {
 # Log to file
 sub logit {
     my ($logfile,$message) = @_;
+    my $date = localtime();
     mkdir_p(dirname($logfile));
     open (LOG, ">> $logfile");
-    printf LOG "%s\t%s\n", localtime(), $message;
+    printf LOG "%s\t%s\n", $date, $message;
     close LOG;
 }
     
