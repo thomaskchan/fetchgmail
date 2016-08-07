@@ -19,6 +19,7 @@ use Crypt::CBC;
 use IO::Prompter;
 use Getopt::Long;
 use Net::Server::Daemonize qw(daemonize);
+use File::Basename;
 
 my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid($<);
 my $groupname = getgrgid($<);
@@ -71,6 +72,7 @@ my $tokenfile = $ENV{"HOME"} . "token.dat";
 my $labelslist = "";
 my $msgidfile = $ENV{"HOME"} . ".fetchgmail.msgid";
 my $pidfile = $ENV{"HOME"} . ".fetchgmail.pid";
+my $logfile = $ENV{"HOME"} . ".fetchgmail.log";
 my $newer = "all";
 my $fetchall = 0;
 my $filters = "";
@@ -92,6 +94,8 @@ if ( -e $configfile ) {
     $msgidfile =~ s/~/$homedir/g;
     $pidfile = $config->param('pidfile') || $pidfile;
     $pidfile =~ s/~/$homedir/g;
+    $logfile = $config->param('logfile') || $logfile;
+    $logfile =~ s/~/$homedir/g;
     $newer = $config->param('newer') || $newer;
     $fetchall = $config->param('fetchall') || $fetchall;
     $filters = $config->param('filters') || $filters;
@@ -101,6 +105,7 @@ if ( -e $configfile ) {
 else {
     print "WARNING: $configfile does not exist, creating from template.\n";
     print "         Please edit and run again.\n";
+    mkdir_p(dirname($configfile);
     open (CONFIG, "> $configfile");
     print CONFIG <<EOF; 
 # What to pipe each mail to
@@ -133,8 +138,12 @@ token ~/.fetchgmail.token
 msgid ~/.fetchgmail.msgid
 
 # Path to pidfile
-# pidfile ~/.fetchmail.pid
+# pidfile ~/.fetchgmail.pid
 pidfile ~/.fetchgmail.pid
+
+# Path to logfile
+# logfile ~/.fetchgmail.log
+logfile ~/.fetchgmail.log
 
 # Fetch all messages whether seen or not (not enabled by default)
 # fetchall 0    Do partial sync + msgid
@@ -356,15 +365,18 @@ while (1) {
     if ($msgid->{latest}) {
         eval {
             $debug && print "Performing partial sync from id $msgid->{latest}\n";
+            $logfile && logit($logfile,"Performing partial sync from id $msgid->{latest}");
             &partialsync;
         };
         if ($@ =~ /^404/) {
             $debug && print "Partial sync failed, performing full sync\n";
+            $logfile && logit($logfile,"Partial sync failed, performing full sync");
             &fullsync;
         }
     }
     else {
         $debug && print "Performing full sync\n";
+        $logfile && logit($logfile,"Performing full sync");
         &fullsync;
     }
 
@@ -411,6 +423,7 @@ sub partialsync {
             push @messages, $added->{messagesAdded}->[0]->{message};
         }
         $debug && print scalar @messages . " messages found\n";
+        $logfile && logit($logfile, scalar @messages . " messages found\n";
     }
 }
 
@@ -435,10 +448,12 @@ sub fullsync {
     #print Dumper($res);
     if (!$res->{messages}) {
         $debug && print "No results found.\n";
+        $logfile && logit($logfile,"No results found.");
         exit;
     }
     @messages = @{$res->{messages}};
     $debug && print scalar @messages . " messages found\n";
+    $logfile && logit($logfile,scalar @messages . " messages found");
    
     # Pull next pages of message lists 
     while($res->{nextPageToken}) {
@@ -450,6 +465,7 @@ sub fullsync {
         )->execute({ auth_driver => $auth_driver });
         push @messages, @{$res->{messages}};
         $debug && print scalar @messages . " messages found\n";
+        $logfile && logit($logfile,scalar @messages . " messages found");
     }
 
     # messages.list is in reverse chronological order
@@ -466,10 +482,12 @@ sub getmessages {
         # Test if we have already previously gotten this id
         if ($msgid->{$message_id}) {
             $debug && print "Skipping $message_id\n";
+            $logfile && logit($logfile,"Skipping $message_id");
             next;
         }
         else {
             $debug && print "Getting $message_id\n";
+            $logfile && logit($logfile,"Getting $message_id");
         }
 
         eval {
@@ -485,6 +503,7 @@ sub getmessages {
         };
         if ($@ =~ /^404/) {
             $debug && print "Skipping $message_id, unable to get.  You may wish to run a full sync later.\n";
+            $logfile && logit($logfile,"Skipping $message_id, unable to get.  You may wish to run a full sync later.");
             next;
         }
         # Gather labels
@@ -507,6 +526,7 @@ sub getmessages {
         # If label doesn't match, then don't get the mail
         if (! $labelmatch) {
             $debug && print "Skipping $message_id, labels don't match the ones we are looking for.\n";
+            $logfile && logit($logfile,"Skipping $message_id, labels don't match the ones we are looking for.");
             next;
         }
         
@@ -633,6 +653,7 @@ sub gettoken {
     }
     else {
         my $encrypted = encrypt(freeze($token),$passphrase);
+        mkdir_p(dirname($tokenfile));
         open(FH, "> $tokenfile");
         print FH $encrypted;
         close (FH);
@@ -665,3 +686,23 @@ sub msgid_clean {
 
     store $msgid, $msgidfile;
 }
+
+# mkdir -p equivalent
+sub mkdir_p {
+    my ($dir) = @_;
+    if ( -d $dir) {
+        return;
+    }
+    mkdir_p(dirname($dir));
+    mkdir $dir;
+}
+
+# Log to file
+sub logit {
+    my ($logfile,$message) = @_;
+    mkdir_p(dirname($logfile));
+    open (LOG, ">> $logfile");
+    printf LOG '%s\t%s\n', localtime(), $message;
+    close LOG;
+}
+    
