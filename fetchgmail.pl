@@ -702,7 +702,7 @@ sub logit {
     my ($logfile,$message) = @_;
     mkdir_p(dirname($logfile));
     open (LOG, ">> $logfile");
-    printf LOG '%s\t%s\n', localtime(), $message;
+    printf LOG "%s\t%s\n", localtime(), $message;
     close LOG;
 }
     
