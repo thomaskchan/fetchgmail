@@ -506,6 +506,7 @@ sub getmessages {
 
         # If label doesn't match, then don't get the mail
         if (! $labelmatch) {
+            $debug && print "Skipping $message_id, labels don't match the ones we are looking for.\n";
             next;
         }
         
