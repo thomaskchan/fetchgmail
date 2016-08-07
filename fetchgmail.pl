@@ -221,7 +221,6 @@ else {
 }
 
 my $res;
-my %body;
 
 # Get msgid cache
 my $msgid = {};
@@ -266,8 +265,6 @@ if ($opt_labels) {
     exit;
 }
 
-my @messages;
-
 # Daemonize this program
 if ($daemon) {
     daemonize($username,$groupname,$pidfile);
@@ -275,7 +272,7 @@ if ($daemon) {
 
 # Loop for periodic poll
 while (1) {
-    %body = ();
+    my %body;
 
     # Build array of labelIds
     if ($labelslist) {
@@ -295,31 +292,29 @@ while (1) {
     }
 
     # Get list of messages
-    
-    # Clear message array per run
-    undef(@messages);
+    my @messages; 
 
     # Test to see if we do a partial or full sync
     if ($msgid->{latest}) {
         eval {
             $debug && print "Performing partial sync from id $msgid->{latest}\n";
             $logfile && logit($logfile,"Performing partial sync from id $msgid->{latest}");
-            &partialsync;
+            @messages = &partialsync(%body);
         };
         if ($@ =~ /^404/) {
             $debug && print "Partial sync failed, performing full sync\n";
             $logfile && logit($logfile,"Partial sync failed, performing full sync");
-            &fullsync;
+            @messages = &fullsync(%body);
         }
     }
     else {
         $debug && print "Performing full sync\n";
         $logfile && logit($logfile,"Performing full sync");
-        &fullsync;
+        @messages = &fullsync(%body);
     }
 
     # Get the messages from the message list
-    &getmessages;
+    &getmessages(@messages);
 
     if ($daemon) {
         sleep $daemon;
@@ -333,6 +328,10 @@ exit;
 
 # Do partial sync based on history id
 sub partialsync {
+    my %body = @_;
+
+    my @messages;
+
     $body{body}{userId} = 'me';
 
     $body{body}{startHistoryId} = $msgid->{latest};
@@ -363,10 +362,16 @@ sub partialsync {
         $debug && print scalar @messages . " messages found\n";
         $logfile && logit($logfile, scalar @messages . " messages found");
     }
+
+    return @messages;
 }
 
 # Do full sync based on messages.list
 sub fullsync {
+    my %body = @_;
+
+    my @messages;
+
     $body{body}{userId} = 'me';
 
     # Add query search params
@@ -408,10 +413,13 @@ sub fullsync {
 
     # messages.list is in reverse chronological order
     @messages = reverse @messages;
+
+    return @messages;
 }
 
 # Get message
 sub getmessages {
+    my @messages = @_;
     foreach my $message (@messages) {
         #print Dumper ($message);
         my $message_id = $message->{id};
