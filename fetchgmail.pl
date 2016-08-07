@@ -68,11 +68,11 @@ my $defaultconfig = $ENV{"HOME"} . "/.fetchgmailrc";
 my $mdacmd = "cat";
 my $clientid = "";
 my $clientsecret = "";
-my $tokenfile = $ENV{"HOME"} . "token.dat";
+my $tokenfile = $ENV{"HOME"} . ".fetchgmail/token.dat";
 my $labelslist = "";
-my $msgidfile = $ENV{"HOME"} . ".fetchgmail.msgid";
-my $pidfile = $ENV{"HOME"} . ".fetchgmail.pid";
-my $logfile = $ENV{"HOME"} . ".fetchgmail.log";
+my $msgidfile = $ENV{"HOME"} . ".fetchgmail/.fetchgmail.msgid";
+my $pidfile = $ENV{"HOME"} . ".fetchgmail/.fetchgmail.pid";
+my $logfile = $ENV{"HOME"} . ".fetchgmail/.fetchgmail.log";
 my $newer = "all";
 my $fetchall = 0;
 my $filters = "";
@@ -130,20 +130,20 @@ clientid 1234567890ab-1234567890abcdefghijklmnopqrstuv.apps.googleusercontent.co
 clientsecret 1234-567890abcdefghijklm
 
 # Where to save google token
-# token ~/.fetchgmail.token
-token ~/.fetchgmail.token
+# token ~/.fetchgmail/.fetchgmail.token
+token ~/.fetchgmail/.fetchgmail.token
 
 # Message ID cache
-# msgid ~/.fetchgmail.msgid
-msgid ~/.fetchgmail.msgid
+# msgid ~/.fetchgmail/.fetchgmail.msgid
+msgid ~/.fetchgmail/.fetchgmail.msgid
 
 # Path to pidfile
-# pidfile ~/.fetchgmail.pid
-pidfile ~/.fetchgmail.pid
+# pidfile ~/.fetchgmail/.fetchgmail.pid
+pidfile ~/.fetchgmail/.fetchgmail.pid
 
 # Path to logfile
-# logfile ~/.fetchgmail.log
-logfile ~/.fetchgmail.log
+# logfile ~/.fetchgmail/.fetchgmail.log
+logfile ~/.fetchgmail/.fetchgmail.log
 
 # Fetch all messages whether seen or not (not enabled by default)
 # fetchall 0    Do partial sync + msgid
