@@ -531,6 +531,10 @@ sub getmessages {
         if (! $labelmatch) {
             $debug && print "Skipping $message_id, labels don't match the ones we are looking for.\n";
             $logfile && logit($logfile,"Skipping $message_id, labels don't match the ones we are looking for.");
+            # Log our skipped message into msgid, and update latest historyId
+            $msgid->{$message_id} = time;
+            $msgid->{latest} = $res->{historyId};
+            store $msgid, $msgidfile;
             next;
         }
         
