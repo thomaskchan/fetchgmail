@@ -15,6 +15,7 @@ Inspired by fetchmail, this allows you to fetch your mail from Gmail using the G
 - module Net::Server::Daemonize
 - module File::Basename
 - module File::Monitor
+- module IO::Pager
 - ps
 
 ## Using fetchgmail

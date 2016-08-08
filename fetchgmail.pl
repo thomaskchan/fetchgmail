@@ -21,6 +21,7 @@ use Getopt::Long;
 use Net::Server::Daemonize qw(daemonize);
 use File::Basename;
 use File::Monitor;
+use IO::Pager;
 
 my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid($<);
 my $groupname = getgrgid($<);
@@ -586,6 +587,7 @@ sub getmessage {
     my $raw = $res->{raw};
     my $decodedmail = urlsafe_b64decode($raw);
 
+    my $pager = IO::Pager::open *STDOUT;
     print $decodedmail;
 }
 
