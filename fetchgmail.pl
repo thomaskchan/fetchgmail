@@ -423,7 +423,8 @@ sub partialsync {
     foreach my $added (@{$res->{history}}) {
         push @messages, $added->{messagesAdded}->[0]->{message};       
     }
-    #debug && print scalar @messages . " messages found\n";
+    $debug && print scalar @messages . " messages found\n";
+    $logfile && logit($logfile, scalar @messages . " messages found");
 
     # Pull next pages of message lists
     while($res->{nextPageToken}) {
