@@ -264,7 +264,7 @@ if ($encryptedtoken) {
     if ($opt_passwd) {
         &restoretoken($opt_passwd);
     }
-    elsif ($passwd} {
+    elsif ($passwd) {
         &restoretoken($passwd);
     }
     else {
