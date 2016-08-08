@@ -116,7 +116,7 @@ sub readconfig {
 }
 
 # Monitor config file for changes
-my $monitor = File::Monitor->();
+my $monitor = File::Monitor->new();
 $monitor->watch($configfile);
 $monitor->scan;
 
