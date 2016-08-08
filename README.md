@@ -3,17 +3,18 @@ Inspired by fetchmail, this allows you to fetch your mail from Gmail using the G
 
 ## Requirements
 - Perl
-- Data::Dumper
-- Google::API::Client
-- Google::API::OAuth2::Client
-- MIME::Base64::URLSafe
-- Config::Simple
-- Storable
-- Crypt::CBC
-- IO::Prompter
-- Getopt::Long
-- Net::Server::Daemonize
-- File::Basename
+- module Data::Dumper
+- module Google::API::Client
+- module Google::API::OAuth2::Client
+- module MIME::Base64::URLSafe
+- module Config::Simple
+- module Storable
+- module Crypt::CBC
+- module IO::Prompter
+- module Getopt::Long
+- module Net::Server::Daemonize
+- module File::Basename
+- ps
 
 ## Using fetchgmail
 
