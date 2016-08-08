@@ -35,7 +35,7 @@ Inspired by fetchmail, this allows you to fetch your mail from Gmail using the G
 ### Remove older message ids (cleanup)
     ./fetchgmail.pl -m AGE  
 Remove seen msgid older than AGE.
-AGE format is [integer][h|d|m|y] (hour|day|month|year), eg 1m
+AGE format is \[integer\]\[h|d|m|y\] (hour|day|month|year), eg 1m
 
 ## Configuration file options
 
