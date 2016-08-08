@@ -238,12 +238,7 @@ my $res;
 
 # Get single message (as requested)
 if ($opt_messageid) {
-    my @messages = (
-        { 
-            id => $opt_messageid, 
-        },
-    );
-    getmessages(@messages);
+    getmessage($opt_messageid);
     exit;
 }
 
@@ -457,7 +452,7 @@ sub fullsync {
     return @messages;
 }
 
-# Get message
+# Get messages
 sub getmessages {
     my @messages = @_;
     foreach my $message (@messages) {
@@ -566,6 +561,32 @@ sub getmessages {
         store $msgid, $msgidfile;
     }
 
+}
+
+# Get single message
+sub getmessage {
+    my ($message_id) = @_;
+
+    eval {
+        # Get raw message
+        $res = $service->users->messages->get(
+            body => {
+                id => $message_id,
+                userId => 'me',
+                format => 'raw',
+                fields => 'historyId,raw,id,labelIds',
+            }
+        )->execute({ auth_driver => $auth_driver });
+    };
+    if ($@ =~ /^404/) {
+        $debug && print "Unable to get $message_id.\n";
+    }
+
+    # Process raw message
+    my $raw = $res->{raw};
+    my $decodedmail = urlsafe_b64decode($raw);
+
+    print $decodedmail;
 }
 
 # Encrypt string
