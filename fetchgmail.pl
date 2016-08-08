@@ -38,12 +38,13 @@ sub usage {
    $command =~ s#^.*/##;
    print STDERR (
       $message,
-      "Usage: $command [-l] [-f .fetchgmailrc] [-m AGE] [-i ID]\n" .
+      "Usage: $command [-l] [-f .fetchgmailrc] [-m AGE] [-i ID] [-p PW] [--quit]\n" .
       "  -l      List labels only\n" .
       "  -f      Path to a .fetchgmailrc file\n" .
       "  -m AGE  Remove seen msgid older than AGE.\n" .
       "          AGE format is [integer][h|d|m|y] (hour|day|month|year), eg 1m\n" .
       "  -i ID   Fetch single message\n" .
+      "  -p PW   Provide password to token on the command line.  Not safe!\n" .
       "  --quit  Terminate the running daemon process\n"
    );
    die("\n")
@@ -54,12 +55,14 @@ my $opt_help;
 my $opt_fetchgmailrc;
 my $opt_msgidclean;
 my $opt_messageid;
+my $opt_passwd = "";
 my $opt_quit;
 Getopt::Long::GetOptions(
     'l' => \$opt_labels,
     'f=s' => \$opt_fetchgmailrc,
     'm=s' => \$opt_msgidclean,
     'i=s' => \$opt_messageid,
+    'p=s' => \$opt_passwd,
     'q|quit' => \$opt_quit,
     'h|help' => \$opt_help,
 )
@@ -228,7 +231,7 @@ if ( -e $tokenfile ) {
 }
 if ($encryptedtoken) {
     # Restore the previous token
-    &restoretoken;
+    &restoretoken($opt_passwd);
 }
 else {
     # Get a new token
@@ -617,7 +620,10 @@ sub decrypt {
 
 # Restore token from encrypted string
 sub restoretoken {
-    my $passphrase = prompt("Enter passphrase for existing token: ", -echo=>'*');
+    my ($passphrase) = @_;
+    if (! $passphrase) {
+        $passphrase = prompt("Enter passphrase for existing token: ", -echo=>'*');
+    }
     my $decrypted = decrypt($encryptedtoken,$passphrase) || "";
     if ($decrypted =~ /access_token/) {
         my $token = thaw($decrypted);

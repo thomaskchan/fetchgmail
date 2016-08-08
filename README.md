@@ -52,7 +52,10 @@ Remove seen msgid older than AGE.
 AGE format is \[integer\]\[h|d|m|y\] (hour|day|month|year), eg 1m
 
 ### Fetch single message by ID
-    ./fetchgmail -i 1234567890abcdef
+    ./fetchgmail.pl -i 1234567890abcdef
+
+### Provide token passphrase on command line
+    ./fetchgmail.pl -p mysuperawesomepassphrase
 
 ## Configuration file options
 
