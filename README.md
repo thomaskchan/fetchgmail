@@ -43,6 +43,9 @@ Inspired by fetchmail, this allows you to fetch your mail from Gmail using the G
 ### Quit a running daemon
     ./fetchgmail.pl --quit
 
+### Show status of running daemon
+    ./fetchgmail.pl -s
+
 ### List all possible Gmail labels
     ./fetchgmail.pl -l
 

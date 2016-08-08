@@ -38,13 +38,14 @@ sub usage {
    $command =~ s#^.*/##;
    print STDERR (
       $message,
-      "Usage: $command [-l] [-f .fetchgmailrc] [-m AGE] [-i ID] [-p PW] [--quit]\n" .
+      "Usage: $command [-l] [-f .fetchgmailrc] [-m AGE] [-i ID] [-p PW] [--quit] [-s]\n" .
       "  -l      List labels only\n" .
       "  -f      Path to a .fetchgmailrc file\n" .
       "  -m AGE  Remove seen msgid older than AGE.\n" .
       "          AGE format is [integer][h|d|m|y] (hour|day|month|year), eg 1m\n" .
       "  -i ID   Fetch single message\n" .
       "  -p PW   Provide password to token on the command line.  Not safe!\n" .
+      "  -s      Show status of daemon\n" .
       "  --quit  Terminate the running daemon process\n"
    );
    die("\n")
@@ -57,12 +58,14 @@ my $opt_msgidclean;
 my $opt_messageid;
 my $opt_passwd = "";
 my $opt_quit;
+my $opt_status;
 Getopt::Long::GetOptions(
     'l' => \$opt_labels,
     'f=s' => \$opt_fetchgmailrc,
     'm=s' => \$opt_msgidclean,
     'i=s' => \$opt_messageid,
     'p=s' => \$opt_passwd,
+    's' => \$opt_status,
     'q|quit' => \$opt_quit,
     'h|help' => \$opt_help,
 )
@@ -191,6 +194,31 @@ if ($opt_quit) {
         print "$pidfile does not exist.  Quitting.\n";
     }
     exit;
+}
+
+# Check status
+if ($opt_status) {
+    my $pid;
+    if ( -e $pidfile) {
+        open(FH, $pidfile);
+        while (<FH>) {  
+            $pid = $_;
+            chomp $pid;
+        }
+        close (FH);
+        # Not that portable, maybe change this out later
+        my $pidname = `ps -hp $pid -o %c`;
+        if ($pidname =~ /$scriptname/) {
+            print "fetchgmail is running on PID $pid\n";
+        }
+        else {
+            print "PID $pid is not found, fetchgmail may not be running.\n";
+        }
+    }
+    else {
+        print "$pidfile does not exist.  Quitting.\n";
+   } 
+   exit;
 }
 
 # Initialize connection
