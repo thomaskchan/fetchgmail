@@ -2,7 +2,18 @@
 Inspired by fetchmail, this allows you to fetch your mail from Gmail using the Google Gmail API.
 
 ## Requirements
-
+- Perl
+- Data::Dumper
+- Google::API::Client
+- Google::API::OAuth2::Client
+- MIME::Base64::URLSafe
+- Config::Simple
+- Storable
+- Crypt::CBC
+- IO::Prompter
+- Getopt::Long
+- Net::Server::Daemonize
+- File::Basename
 
 ## Using fetchgmail
 
