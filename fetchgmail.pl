@@ -238,7 +238,9 @@ my $res;
 
 # Get single message (as requested)
 if ($opt_messageid) {
-    getmessage($opt_messageid);
+    my @messages;
+    push @messages, $opt_messageid;
+    getmessages(@messages);
     exit;
 }
 
