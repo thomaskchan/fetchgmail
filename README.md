@@ -54,6 +54,8 @@ AGE format is \[integer\]\[h|d|m|y\] (hour|day|month|year), eg 1m
 
 Default configuration file is ~/.fetchgmailrc, but you may specify it as an argument.
 
+fetchgmail will detect config file changes and apply them on the next run.  This does not include clientid nor clientsecret, which will require a full restart.
+
 ### mda /usr/bin/formail -s /usr/bin/procmail -f - -m ~/.procmailrc
 - What to pipe each mail to
 
