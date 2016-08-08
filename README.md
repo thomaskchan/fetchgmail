@@ -57,7 +57,7 @@ AGE format is \[integer\]\[h|d|m|y\] (hour|day|month|year), eg 1m
 ### Fetch single message by ID
     ./fetchgmail.pl -i 1234567890abcdef
 
-### Provide token passphrase on command line
+### Provide token passphrase on command line (unsafe option)
     ./fetchgmail.pl -p mysuperawesomepassphrase
 
 ## Configuration file options
@@ -77,6 +77,9 @@ fetchgmail will detect config file changes and apply them on the next run.  This
 
 ### token ~/.fetchgmail/.fetchgmail.token
 - Where to save google token
+
+### passwd mysuperawesomepasshrase
+- Encrypted token passphrase (It's safer to not enable this option)
 
 ### msgid ~/.fetchgmail/.fetchgmail.msgid
 - Message ID cache

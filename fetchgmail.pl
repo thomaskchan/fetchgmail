@@ -80,6 +80,7 @@ my $mdacmd = "cat";
 my $clientid = "";
 my $clientsecret = "";
 my $tokenfile = $ENV{"HOME"} . ".fetchgmail/token.dat";
+my $passwd = "";
 my $labelslist = "";
 my $msgidfile = $ENV{"HOME"} . ".fetchgmail/.fetchgmail.msgid";
 my $pidfile = $ENV{"HOME"} . ".fetchgmail/.fetchgmail.pid";
@@ -111,6 +112,7 @@ sub readconfig {
     $clientsecret = $config->param('clientsecret') || $clientsecret;
     $tokenfile = $config->param('token') || $tokenfile;
     $tokenfile =~ s/~/$homedir/g;
+    $passwd = $config->param('passwd') || $passwd;
     $labelslist = $config->param('labels') || $labelslist;
     $msgidfile = $config->param('msgid') || $msgidfile;
     $msgidfile =~ s/~/$homedir/g;
@@ -259,7 +261,15 @@ if ( -e $tokenfile ) {
 }
 if ($encryptedtoken) {
     # Restore the previous token
-    &restoretoken($opt_passwd);
+    if ($opt_passwd) {
+        &restoretoken($opt_passwd);
+    }
+    elsif ($passwd} {
+        &restoretoken($passwd);
+    }
+    else {
+        &restoretoken;
+    }
 }
 else {
     # Get a new token
@@ -784,6 +794,9 @@ clientsecret 1234-567890abcdefghijklm
 # Where to save google token
 # token ~/.fetchgmail/.fetchgmail.token
 token ~/.fetchgmail/.fetchgmail.token
+
+# Encrypted token passphrase (It's safer to not enable this option)
+# passwd mysuperawesomepasshrase
 
 # Message ID cache
 # msgid ~/.fetchgmail/.fetchgmail.msgid
