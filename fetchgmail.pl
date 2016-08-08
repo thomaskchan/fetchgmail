@@ -237,8 +237,8 @@ else {
 my $res;
 
 # Get single message (as requested)
-if ($opt_message) {
-    getmessage($opt_message);
+if ($opt_messageid) {
+    getmessage($opt_messageid);
     exit;
 }
 
