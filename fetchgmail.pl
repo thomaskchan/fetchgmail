@@ -293,7 +293,7 @@ while (1) {
     my @configchanges = $monitor->scan;
     if (@configchanges) {
         $debug && print "Detected config file change, rereading\n";
-        &logfile && logit($logfile,"Detected config file change, rereading");
+        $logfile && logit($logfile,"Detected config file change, rereading");
         readconfig($configfile);
         readmsgid($fetchall);
     }
