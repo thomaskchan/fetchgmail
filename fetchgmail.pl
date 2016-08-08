@@ -20,6 +20,7 @@ use IO::Prompter;
 use Getopt::Long;
 use Net::Server::Daemonize qw(daemonize);
 use File::Basename;
+use File::Monitor;
 
 my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid($<);
 my $groupname = getgrgid($<);
@@ -82,6 +83,17 @@ my $debug = 0;
 # Read from config file
 my $configfile = $opt_fetchgmailrc || $defaultconfig;
 if ( -e $configfile ) {
+    readconfig($configfile);
+}
+else {
+    print "WARNING: $configfile does not exist, creating from template.\n";
+    print "         Please edit and run again.\n";
+    writeconfig($configfile);
+    exit;
+}
+
+sub readconfig {
+    my ($configfile) = @_;
     my $config = new Config::Simple($configfile);
     $mdacmd = $config->param('mda') || $mdacmd;
     $mdacmd =~ s/~/$homedir/g;
@@ -102,12 +114,11 @@ if ( -e $configfile ) {
     $daemon = $config->param('daemon') || $daemon;
     $debug = $config->param('debug') || $debug;
 }
-else {
-    print "WARNING: $configfile does not exist, creating from template.\n";
-    print "         Please edit and run again.\n";
-    writeconfig($configfile);
-    exit;
-}
+
+# Monitor config file for changes
+my $monitor = File::Monitor->();
+$monitor->watch($configfile);
+$monitor->scan;
 
 # Test to clean msgid
 if ($opt_msgidclean) {
@@ -224,22 +235,27 @@ my $res;
 
 # Get msgid cache
 my $msgid = {};
-if ($fetchall eq "1") {
-    # Do full sync + msgid
-    if ( -e $msgidfile ) {
-        $msgid = retrieve($msgidfile);
+readmsgid($fetchall);
+
+sub readmsgid {
+    my ($fetchall) = @_;
+    if ($fetchall eq "1") {
+        # Do full sync + msgid
+        if ( -e $msgidfile ) {
+            $msgid = retrieve($msgidfile);
+        }
+        # Clear historyId so no partial sync
+        $msgid->{latest} = "";
     }
-    # Clear historyId so no partial sync
-    $msgid->{latest} = "";
-}
-elsif ($fetchall eq "2") {
-    # Do full sync
-    # Don't pull in msgid
-}
-else {
-    # Do partial sync + msgid
-    if ( -e $msgidfile ) {
-        $msgid = retrieve($msgidfile);
+    elsif ($fetchall eq "2") {
+        # Do full sync
+        # Don't pull in msgid
+    }
+    else {
+        # Do partial sync + msgid
+        if ( -e $msgidfile ) {
+            $msgid = retrieve($msgidfile);
+        }
     }
 }
 
@@ -272,6 +288,16 @@ if ($daemon) {
 
 # Loop for periodic poll
 while (1) {
+
+    # Reread config if the file changed
+    my @configchanges = $monitor->scan;
+    if (@configchanges) {
+        $debug && print "Detected config file change, rereading\n";
+        &logfile && logit($logfile,"Detected config file change, rereading");
+        readconfig($configfile);
+        readmsgid($fetchall);
+    }
+
     my %body;
 
     # Build array of labelIds
