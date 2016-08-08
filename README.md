@@ -50,6 +50,9 @@ Inspired by fetchmail, this allows you to fetch your mail from Gmail using the G
 Remove seen msgid older than AGE.
 AGE format is \[integer\]\[h|d|m|y\] (hour|day|month|year), eg 1m
 
+### Fetch single message by ID
+    ./fetchgmail -i 1234567890abcdef
+
 ## Configuration file options
 
 Default configuration file is ~/.fetchgmailrc, but you may specify it as an argument.
