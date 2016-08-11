@@ -16,6 +16,7 @@ Inspired by fetchmail, this allows you to fetch your mail from Gmail using the G
 - module File::Basename
 - module File::Monitor
 - module IO::Pager
+- module Crypt::OpenSSL::AES
 - ps
 
 ## Using fetchgmail
