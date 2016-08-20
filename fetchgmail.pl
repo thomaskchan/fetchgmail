@@ -25,7 +25,7 @@ use IO::Pager;
 use Crypt::OpenSSL::AES;
 
 my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid($<);
-my $groupname = getgrgid($<);
+my $groupname = getgrgid $) || getgrgid $(;
 my $homedir = $ENV{HOME};
 my $scriptname = 'fetchgmail';
 
