@@ -530,19 +530,19 @@ sub getmessages {
             )->execute({ auth_driver => $auth_driver });
         };
         if ($@ =~ /^404/) {
-            $debug && print "ERROR: Skipping $message_id, unable to get (404).  You may wish to run a full sync later.\n";
-            $logfile && logit($logfile,"ERROR: Skipping $message_id, unable to get (404).  You may wish to run a full sync later.");
-            next;
+            $debug && print "ERROR: Skipping $message_id, unable to get (404).\n";
+            $logfile && logit($logfile,"ERROR: Skipping $message_id, unable to get (404).");
+            last;
         }
         elsif ($@ =~ /^500 .*(Can't connect.*?) at /) {a
             $debug && print "ERROR: " . $1 . " for message $message_id\n";
             $logfile && logit($logfile,"ERROR: $1 for message $message_id");
-            next;
+            last;
         }
         elsif ($@ =~ /^(.*?) at /) {
             $debug && print "ERROR: " . $1 . " for message $message_id\n";
             $logfile && logit($logfile,"ERROR: $1 for message $message_id");
-            next;
+            last;
         }
 
         # Gather labels
