@@ -637,7 +637,16 @@ sub getmessage {
         )->execute({ auth_driver => $auth_driver });
     };
     if ($@ =~ /^404/) {
-        $debug && print "Unable to get $message_id.\n";
+        $debug && print "ERROR: Unable to get $message_id (404).\n";
+        exit;
+    }
+    elsif ($@ =~ /^500 .*(Can't connect.*?) at /) {a
+        $debug && print "ERROR: " . $1 . " for message $message_id\n";
+        exit;
+    }
+    elsif ($@ =~ /^(.*?) at /) {
+        $debug && print "ERROR: " . $1 . " for message $message_id\n";
+        exit;
     }
 
     # Process raw message
