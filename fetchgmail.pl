@@ -366,7 +366,10 @@ while (1) {
         # print @labelids;
         # $body{body}{labelIds} = \@labelids;
         #
+        # messages.list takes labelIds
         $body{body}{labelIds} = $labels{$labelslist};
+        # history.list takes labelId
+        $body{body}{labelId} = $labels{$labelslist};
     }
 
     # Get list of messages
