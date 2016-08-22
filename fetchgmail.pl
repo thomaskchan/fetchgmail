@@ -827,9 +827,16 @@ pidfile ~/.fetchgmail/.fetchgmail.pid
 logfile ~/.fetchgmail/.fetchgmail.log
 
 # Fetch all messages whether seen or not (not enabled by default)
-# fetchall 0    Do partial sync + msgid
-# fetchall 1    Do full sync + msgid
-# fetchall 2    Do full sync
+# fetchall 0    - Do partial sync + msgid
+#               This will do a partial sync from the previous history id 
+#               and also check our local msgid file to prevent dupes.
+#               If no partial sync, it will do full sync with msgid checking.
+# fetchall 1    - Do full sync + msgid
+#               This will do a full sync of all mail newer than the "newer" 
+#               value, and also check our local msgid file to prevent dupes.
+# fetchall 2    - Do full sync
+#               This will do a full sync of all mail newer than the "newer"
+#               value.
 fetchall 0
 
 # Fetch all mail newer than date (1h 2d 3m 4y) (Default: all)
