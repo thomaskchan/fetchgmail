@@ -93,13 +93,16 @@ fetchgmail will detect config file changes and apply them on the next run.  This
 
 ### fetchall (0|1|2)
 - How mail will be fetched
+
 #### fetchall 0
 - Do partial sync + msgid
 - This will do a partial sync from the previous history id and also check our local msgid file to prevent dupes
 - If there is no partial sync, it will do a full sync with msgid checking
+
 #### fetchall 1
 - Do full sync + msgid
 - This will do a full sync of all mail newer than the "newer" value, and also check our local msgid file to prevent dupes
+
 #### fetchall 2
 - Do full sync
 - This will do a full sync of all mail newer than the "newer" value
