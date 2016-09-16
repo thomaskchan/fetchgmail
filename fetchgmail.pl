@@ -507,6 +507,11 @@ sub getmessages {
         my $message_id = $message->{id};
         #print $message_id . "\n";
 
+        # Skip message if there's no message id.  Not sure why we get empty data sometimes.
+        if (! $message_id) {
+            next;
+        }
+
         # Test if we have already previously gotten this id
         if ($msgid->{$message_id}) {
             $debug && print "Skipping $message_id\n";
