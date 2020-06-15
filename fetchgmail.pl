@@ -489,7 +489,7 @@ sub fullsync {
         %body
     )->execute({ auth_driver => $auth_driver });
     #print Dumper($res);
-    if (!$res->{messages}) {
+    if ($res eq "1" || !$res->{messages}) {
         $debug && print "No results found.\n";
         $logfile && logit($logfile,"No results found.");
         exit;
