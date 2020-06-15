@@ -39,12 +39,14 @@ sub usage {
    $command =~ s#^.*/##;
    print STDERR (
       $message,
-      "Usage: $command [-l] [-f .fetchgmailrc] [-m AGE] [-i ID] [-p PW] [--quit] [-s]\n" .
+      "Usage: $command [-l] [-f .fetchgmailrc] [-m AGE] [-i ID] [-b|w ID] [-p PW] [--quit] [-s]\n" .
       "  -l      List labels only\n" .
       "  -f      Path to a .fetchgmailrc file\n" .
       "  -m AGE  Remove seen msgid older than AGE.\n" .
       "          AGE format is [integer][h|d|m|y] (hour|day|month|year), eg 1m\n" .
       "  -i ID   Fetch single message\n" .
+      "  -b ID   Blacklist single message from being fetched (add as seen msgid)\n" .
+      "  -w ID   Whitelist single message when being fetched (rm from seen msgid)\n" .
       "  -p PW   Provide password to token on the command line.  Not safe!\n" .
       "  -s      Show status of daemon\n" .
       "  --quit  Terminate the running daemon process\n"
@@ -57,6 +59,8 @@ my $opt_help;
 my $opt_fetchgmailrc;
 my $opt_msgidclean;
 my $opt_messageid;
+my $opt_blackid;
+my $opt_whiteid;
 my $opt_passwd = "";
 my $opt_quit;
 my $opt_status;
@@ -65,6 +69,8 @@ Getopt::Long::GetOptions(
     'f=s' => \$opt_fetchgmailrc,
     'm=s' => \$opt_msgidclean,
     'i=s' => \$opt_messageid,
+    'b=s' => \$opt_blackid,
+    'w=s' => \$opt_whiteid,
     'p=s' => \$opt_passwd,
     's' => \$opt_status,
     'q|quit' => \$opt_quit,
@@ -288,6 +294,18 @@ if ($opt_messageid) {
 # Get msgid cache
 my $msgid = {};
 readmsgid($fetchall);
+
+if ($opt_blackid) {
+    $msgid->{$opt_blackid} = time;
+    store $msgid, $msgidfile;
+    exit;
+}
+
+if ($opt_whiteid) {
+    delete $msgid->{$opt_whiteid};
+    store $msgid, $msgidfile;
+    exit;
+}
 
 sub readmsgid {
     my ($fetchall) = @_;
