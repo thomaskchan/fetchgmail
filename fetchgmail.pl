@@ -246,13 +246,14 @@ my $auth_doc = {
 };
 
 # Set up client secrets
+my $local_port = "8122";
 my $auth_driver = Google::API::OAuth2::Client->new(
     {
         auth_uri => 'https://accounts.google.com/o/oauth2/auth',
         token_uri => 'https://accounts.google.com/o/oauth2/token',
         client_id => $clientid,
         client_secret => $clientsecret,
-        redirect_uri => "urn:ietf:wg:oauth:2.0:oob",
+        redirect_uri => "http://127.0.0.1:$local_port",
         auth_doc => $auth_doc,
     }
 );
@@ -728,8 +729,63 @@ sub gettoken {
     print "Go to the following URL to authorize use:\n\n";
     print "  " . $url . "\n\n";
 
-    my $code = prompt("Paste the code from google: ", -echo=>'*');
-    print "\n";
+    my $code;
+
+    print "Spinning up http://127.0.0.1:$local_port in 15 seconds.\n";
+    if (my $output = prompt("Hit ENTER if you would rather authenticate manually: ", -yes, -single, -default=>'y', -timeout=>15) && !$_->timedout) {
+        # We'll just parse the code out of the URL
+        print "\n";
+        my $returned_url = prompt("Paste the redirected URL from google after authenticating: ",-echo=>'*');
+        print "\n";
+
+        if ($returned_url =~ /[?&]code=([a-zA-Z0-9\/_-]+)&?/) {
+            $code = $1;
+        }
+        else {
+            print "ERROR: Couldn't parse URL\n";
+            exit;
+        }
+
+    }
+    else {
+        # Spin up web server to accept redirect
+        print "\n\n";
+        print "Starting server at http://127.0.0.1:$local_port\n\n";
+        print "Waiting for connection...\n\n";
+
+        use HTTP::Daemon;
+        use HTTP::Response;
+
+        my $d = HTTP::Daemon->new(LocalPort => $local_port, ReuseAddr => 1) || die;
+        HTTPD: while (my $c = $d->accept) {
+            while (my $r = $c->get_request) {
+                #print $r->uri->path . "\n";
+
+                my $uri = $r->uri;
+                my $query = $uri->query || "";
+                #print "$query\n";
+
+                if ($query =~ /code=([a-zA-Z0-9\/_-]+)&?/) {
+                    $code = $1;
+
+                    my $response = HTTP::Response->new('200');
+                    $response->content('Received token, you may close this page');
+                    $c->send_response($response);
+                    last HTTPD;
+                }
+                else {
+                    my $response = HTTP::Response->new('400');
+                    $response->content('Invalid token URL');
+                    $c->send_response($response);
+                }
+            }
+            $c->close;
+            undef($c);
+        }
+        $d->close;
+        undef($d);
+    }
+
 
     my $token = $auth_driver->exchange($code);
     if (! $token) {
@@ -740,6 +796,7 @@ sub gettoken {
     my $passphrase = 1;
     my $passphrase2 = 2;
     until ($passphrase eq $passphrase2) {
+        print "\n";
         print "We will now encrypt your code before caching it.\n";
         print "Leave the passphrase blank if you don't want to cache it.\n";
         print "This means that you will need to reauthorize every time.\n";
